@@ -1,61 +1,35 @@
 import React, { useState } from 'react';
-import {
-  View,
-  Text,
-  FlatList,
-  Button,
-  StyleSheet,
-  TouchableOpacity,
-  Image,
-  Alert,
-} from 'react-native';
+import { View, Text, FlatList, Button, TouchableOpacity, StyleSheet, Image } from 'react-native';
 
 export default function DogList({ navigation }) {
-  const [dogs, setDogs] = useState([
-    { id: '1', name: 'Buddy', breed: 'Golden Retriever', image: 'https://i.pinimg.com/originals/00/6d/a4/006da426390620d40684dd06845fe743.jpg' },
-    { id: '2', name: 'Bella', breed: 'Labrador', image: 'https://media.istockphoto.com/id/946835070/photo/american-pit-bull-dog.jpg?s=612x612&w=0&k=20&c=62Z_Iak9dYxgtAifzZIZedKTCSgQVLHFbsmNCnE8O1c=' },
-  ]);
+  const [dogs, setDogs] = useState([]);
 
-  const handleDeleteDog = (id) => {
-    Alert.alert('Confirm Delete', 'Are you sure you want to delete this dog?', [
-      {
-        text: 'Cancel',
-        style: 'cancel',
-      },
-      {
-        text: 'Delete',
-        style: 'destructive',
-        onPress: () => setDogs((prevDogs) => prevDogs.filter((dog) => dog.id !== id)),
-      },
-    ]);
+  const handleNavigateToAddDog = () => {
+    navigation.navigate('AddDog', { setDogs });
   };
+
+  const renderDog = ({ item }) => (
+    <TouchableOpacity
+      style={styles.dogItem}
+      onPress={() => navigation.navigate('DogDetails', { dog: item })}
+    >
+      <Image source={{ uri: item.image }} style={styles.dogImage} />
+      <View>
+        <Text style={styles.dogName}>{item.name}</Text>
+        <Text style={styles.dogBreed}>{item.breed}</Text>
+      </View>
+    </TouchableOpacity>
+  );
 
   return (
     <View style={styles.container}>
       <FlatList
         data={dogs}
+        renderItem={renderDog}
         keyExtractor={(item) => item.id}
-        renderItem={({ item }) => (
-          <View style={styles.card}>
-            <TouchableOpacity
-              style={styles.details}
-              onPress={() => navigation.navigate('DogDetails', { dog: item })}
-            >
-              <Image source={{ uri: item.image }} style={styles.image} />
-              <View>
-                <Text style={styles.name}>{item.name}</Text>
-                <Text style={styles.breed}>{item.breed}</Text>
-              </View>
-            </TouchableOpacity>
-            <Button
-              title="Delete"
-              color="#d9534f"
-              onPress={() => handleDeleteDog(item.id)}
-            />
-          </View>
-        )}
+        ListEmptyComponent={<Text style={styles.emptyText}>No dogs added yet!</Text>}
       />
-      <Button title="Add Dog" onPress={() => navigation.navigate('AddDog', { setDogs })} />
+      <Button title="Add Dog" onPress={handleNavigateToAddDog} />
     </View>
   );
 }
@@ -66,36 +40,36 @@ const styles = StyleSheet.create({
     padding: 20,
     backgroundColor: '#f8f9fa',
   },
-  card: {
+  dogItem: {
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'space-between',
-    padding: 15,
-    backgroundColor: '#fff',
+    marginBottom: 15,
+    padding: 10,
     borderRadius: 8,
-    marginBottom: 10,
+    backgroundColor: '#fff',
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
+    shadowOffset: { width: 0, height: 1 },
     shadowOpacity: 0.1,
-    shadowRadius: 8,
+    shadowRadius: 3,
   },
-  details: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    flex: 1,
-  },
-  image: {
+  dogImage: {
     width: 50,
     height: 50,
     borderRadius: 25,
     marginRight: 15,
   },
-  name: {
-    fontSize: 18,
+  dogName: {
+    fontSize: 16,
     fontWeight: 'bold',
   },
-  breed: {
+  dogBreed: {
     fontSize: 14,
     color: '#555',
+  },
+  emptyText: {
+    fontSize: 16,
+    color: '#888',
+    textAlign: 'center',
+    marginTop: 20,
   },
 });
